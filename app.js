@@ -83,7 +83,7 @@ app.post('/users', (req,res)=>{
             return res.status(500).json({error: 'Error con conexion de datos'});
         }
         const users = JSON.parse(data);
-        const validation = validateUser(newUser, users);
+        const validation = validateUser(newUser, users, false);
         if(!validation.isValid){
             return res.status(400).json({error: validation.error});
         }
@@ -108,7 +108,7 @@ app.put('/users/:id',(req,res)=>{
         }
         let users = JSON.parse(data);
 
-        const validation = validateUser(updatedUser, users);
+        const validation = validateUser(updatedUser, users, true);
         if(!validation.isValid){
             return res.status(400).json({error: validation.error});
         }
@@ -127,11 +127,24 @@ app.put('/users/:id',(req,res)=>{
     });  
 });
 });
+
+app.delete('/users/:id',(req,res)=>{
+    const userId = parseInt(req.params.id,10);
+    fs.readFile(usersFilePath,'utf-8',(err,data)=>{
+        if(err){
+            return res.status(500).json({error: 'Error con conexion de datos'});
+        }
+        let users = JSON.parse(data);
+        users = users.filter(user => user.id !== userId);
+        fs.writeFile(usersFilePath, JSON.stringify(users,null, 2),err =>{
+            if(err){
+            return res.status(500).json({error: 'Error al eliminar usuario'});
+        }
+        res.status(204).send();
+    });
+    })
+})
+
 app.listen(PORT, ()=>{
     console.log(`Servidor : http://localhost:${PORT}`);
 })
-
-function validarEmail(email) {
-    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-    return regex.test(email);
-}

@@ -11,7 +11,7 @@ function uniqueId(id, users) {
     return typeof id === 'number' && !users.some(user => user.id === id);
 }
 
-function validateUser(newUser, users) {
+function validateUser(newUser, users, updatedUser) {
     const {name, email, id} = newUser;
 
     if (!newUser || Object.keys(newUser).length === 0)
@@ -23,9 +23,10 @@ function validateUser(newUser, users) {
     if (!validEmail(email))
         return { isValid: false, error: 'El correo indicado no es correcto' };
 
+    if(!updatedUser){
     if (!uniqueId(id, users))
         return { isValid: false, error: 'El ID de usuario ya existe' };
-
+    }
     return { isValid: true };
 }
 

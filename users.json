@@ -1,32 +1,7 @@
 [
   {
-    "id": 2,
-    "name": "Kate",
-    "email": "Kate2019@gmail.com"
-  },
-  {
-    "id": 2,
-    "name": "Jenny Smith",
-    "email": "jenny2025@gmail.com"
-  },
-  {
-    "id": 2,
-    "name": "JUANITA",
-    "email": "Kate2019@gmail.com"
-  },
-  {
-    "id": 3,
-    "name": "John",
-    "email": "john2019@gmail.com"
-  },
-  {
-    "id": 3,
-    "name": "John",
-    "email": "john2019@gmail.com"
-  },
-  {
-    "id": 3,
-    "name": "John",
-    "email": "john2019@gmail.com"
+    "id": 4,
+    "name": "Jod",
+    "email": "john@gmail.com"
   }
 ]
