@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const {validateUser} = require('./utils/validation');
 const bodyParser = require('body-parser')
 
 const fs = require('fs');
@@ -77,21 +78,16 @@ app.get('/users', (req,res)=>{
 
 app.post('/users', (req,res)=>{
     const newUser = req.body;
-    if(!newUser || Object.keys(newUser).length === 0)
-        return res.status(400).json({error: 'No llegaron datos'});
-    
-    if(newUser.name.length<3)   
-        return res.status(428).json({error: 'El nombre no cumple con los requisitos'});
-    
-    if(!validarEmail(newUser.email))
-        return res.status(428).json({error: 'El correo indicado no es correcto'});
-    
-    
     fs.readFile(usersFilePath,'utf-8',(err,data)=>{
         if(err){
             return res.status(500).json({error: 'Error con conexion de datos'});
         }
         const users = JSON.parse(data);
+        const validation = validateUser(newUser, users);
+        if(!validation.isValid){
+            return res.status(400).json({error: validation.error});
+        }
+
         users.push(newUser);
         fs.writeFile(usersFilePath, JSON.stringify(users,null, 2),err =>{
             if(err){
@@ -102,6 +98,35 @@ app.post('/users', (req,res)=>{
     });
 });
 
+app.put('/users/:id',(req,res)=>{
+    const userId = parseInt(req.params.id,10);
+    const updatedUser = req.body;
+
+    fs.readFile(usersFilePath,'utf-8',(err,data)=>{
+        if(err){
+            return res.status(500).json({error: 'Error con conexion de datos'});
+        }
+        let users = JSON.parse(data);
+
+        const validation = validateUser(updatedUser, users);
+        if(!validation.isValid){
+            return res.status(400).json({error: validation.error});
+        }
+
+        const userIndex = users.findIndex(user => user.id === userId);
+        if(userIndex === -1){
+            return res.status(404).json({error: 'Usuario no encontrado'});
+        }
+        
+        users[userIndex] = {...users[userIndex], ...updatedUser};
+
+        fs.writeFile(usersFilePath, JSON.stringify(users,null, 2),err =>{
+            if(err){
+            return res.status(500).json({error: 'Error al actualizar datos'});
+        }
+    });  
+});
+});
 app.listen(PORT, ()=>{
     console.log(`Servidor : http://localhost:${PORT}`);
 })
